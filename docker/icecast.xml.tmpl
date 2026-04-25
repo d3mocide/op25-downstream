@@ -1,0 +1,66 @@
+<icecast>
+    <location>Earth</location>
+    <admin>admin@localhost</admin>
+
+    <limits>
+        <clients>20</clients>
+        <sources>4</sources>
+        <queue-size>524288</queue-size>
+        <client-timeout>30</client-timeout>
+        <header-timeout>15</header-timeout>
+        <source-timeout>10</source-timeout>
+        <burst-on-connect>1</burst-on-connect>
+        <burst-size>65535</burst-size>
+    </limits>
+
+    <authentication>
+        <!-- Password used by liquidsoap (Icecast source client) -->
+        <source-password>${ICECAST_SOURCE_PASSWORD}</source-password>
+        <relay-password>${ICECAST_RELAY_PASSWORD}</relay-password>
+        <admin-user>admin</admin-user>
+        <!-- Password for the Icecast web admin UI at http://host:8000/admin -->
+        <admin-password>${ICECAST_ADMIN_PASSWORD}</admin-password>
+    </authentication>
+
+    <!-- This hostname appears in stream listings and the admin UI -->
+    <hostname>${ICECAST_HOSTNAME}</hostname>
+
+    <listen-socket>
+        <port>${ICECAST_PORT}</port>
+    </listen-socket>
+
+    <!-- Allow cross-origin requests so the OP25 web UI can query stream status -->
+    <http-headers>
+        <header name="Access-Control-Allow-Origin" value="*" />
+    </http-headers>
+
+    <!-- Default mount metadata applied to all streams unless overridden -->
+    <mount type="default">
+        <public>1</public>
+        <stream-name>OP25 P25 Scanner</stream-name>
+        <stream-description>OP25 P25 Digital Radio Scanner</stream-description>
+        <genre>Public Safety</genre>
+    </mount>
+
+    <fileserve>1</fileserve>
+
+    <paths>
+        <basedir>/usr/share/icecast2</basedir>
+        <logdir>/var/log/icecast2</logdir>
+        <webroot>/usr/share/icecast2/web</webroot>
+        <adminroot>/usr/share/icecast2/admin</adminroot>
+        <alias source="/" destination="/status.xsl"/>
+    </paths>
+
+    <logging>
+        <!-- "-" sends logs to stdout so Docker captures them -->
+        <accesslog>-</accesslog>
+        <errorlog>-</errorlog>
+        <!-- 1=error 2=warn 3=info 4=debug -->
+        <loglevel>3</loglevel>
+    </logging>
+
+    <security>
+        <chroot>0</chroot>
+    </security>
+</icecast>

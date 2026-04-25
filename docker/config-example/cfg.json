@@ -1,0 +1,109 @@
+{
+    "_comment": "OP25 config for Docker/headless Icecast deployment.",
+    "_comment2": "Edit devices[], trunking.chans[], and metadata.streams[] for your system.",
+    "_comment3": "Audio goes to liquidsoap via UDP, so the 'audio' section is intentionally absent.",
+
+    "channels": [
+        {
+            "name": "Channel 0",
+            "device": "sdr0",
+            "trunking_sysname": "System 0",
+            "meta_stream_name": "",
+            "demod_type": "cqpsk",
+            "cqpsk_tracking": true,
+            "tracking_threshold": 120,
+            "tracking_feedback": 0.75,
+
+            "_comment": "UDP port must match AUDIO_PORT env var (default 23456).",
+            "destination": "udp://127.0.0.1:23456",
+
+            "excess_bw": 0.2,
+            "filter_type": "rc",
+            "if_rate": 24000,
+            "plot": "",
+            "symbol_rate": 4800,
+            "enable_analog": "off",
+            "blacklist": "",
+            "whitelist": "",
+
+            "_comment2": "0=allow encrypted, 1=silence encrypted, 2=skip encrypted",
+            "crypt_behavior": 0,
+            "crypt_keys": ""
+        }
+    ],
+
+    "devices": [
+        {
+            "_comment": "args: 'rtl' for RTL-SDR, 'airspy' for Airspy, 'uhd' for USRP, 'hackrf' for HackRF",
+            "args": "rtl",
+            "gains": "LNA:39",
+            "gain_mode": false,
+            "name": "sdr0",
+            "offset": 0,
+            "ppm": 0.0,
+            "rate": 1000000,
+            "usable_bw_pct": 0.85,
+            "tunable": true
+        }
+    ],
+
+    "trunking": {
+        "module": "tk_p25.py",
+        "chans": [
+            {
+                "sysname": "System 0",
+                "nac": "0x0",
+
+                "_comment": "Comma-separated list of known control channel frequencies in MHz.",
+                "control_channel_list": "773.84375",
+
+                "_comment2": "Create a tgid-tags.tsv file in /config to map talkgroup IDs to names.",
+                "tgid_tags_file": "tgid-tags.tsv",
+
+                "whitelist": "",
+                "blacklist": "",
+                "tdma_cc": false
+            }
+        ]
+    },
+
+    "metadata": {
+        "module": "icemeta.py",
+        "streams": [
+            {
+                "_comment": "stream_name must match the Icecast mount set in ICECAST_MOUNT env var.",
+                "stream_name": "",
+                "meta_format_idle": "[idle]",
+                "meta_format_tgid": "[%TGID%]",
+                "meta_format_tag":  "[%TGID%] %TAG%",
+
+                "_comment2": "Point to the internal icecast2 instance. Port must match ICECAST_PORT.",
+                "icecastServerAddress": "localhost:8000",
+                "icecastMountpoint": "op25",
+                "icecastMountExt": ".mp3",
+
+                "_comment3": "Password must match ICECAST_SOURCE_PASSWORD env var.",
+                "icecastPass": "op25source",
+                "delay": 0.0
+            }
+        ]
+    },
+
+    "_comment_audio": "No 'audio' section — liquidsoap reads UDP:23456 directly via audio.py -s.",
+
+    "terminal": {
+        "module": "terminal.py",
+        "_comment": "Bind to 0.0.0.0 so the web UI is accessible from outside the container.",
+        "terminal_type": "http:0.0.0.0:8080",
+        "curses_plot_interval": 0.1,
+        "http_plot_interval": 1.0,
+        "http_plot_directory": "../www/images",
+        "tuning_step_large": 1200,
+        "tuning_step_small": 100,
+        "smart_colors": [
+            { "keywords": [ "fire", "fd" ],                             "color": "#ff5c5c" },
+            { "keywords": [ "pd", "police", "sheriff", "so", "law" ],   "color": "#66aaff" },
+            { "keywords": [ "ems", "med", "ambulance" ],                "color": "#ffb84d" }
+        ]
+    }
+}

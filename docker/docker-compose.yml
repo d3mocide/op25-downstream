@@ -1,0 +1,58 @@
+services:
+  op25:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: op25
+
+    # --- SDR hardware access ---
+    # Pass through the entire USB bus so the RTL-SDR dongle is visible.
+    # If you know the specific bus/device, use a more targeted path:
+    #   devices:
+    #     - /dev/bus/usb/001/003:/dev/bus/usb/001/003
+    privileged: true   # simplest for USB; replace with devices: block if preferred
+
+    # --- Config files ---
+    # Mount the directory containing your cfg.json, tgid-tags.tsv, etc.
+    volumes:
+      - ./config-example:/config      # change to your actual config directory
+      # Optional: persist recordings
+      # - /data/op25-recordings:/recordings
+
+    # --- Ports ---
+    ports:
+      - "8000:8000"   # Icecast: stream playback + admin UI
+      - "8080:8080"   # OP25 web dashboard
+
+    # --- Runtime tuning ---
+    environment:
+      # Name of the config file inside /config (default: cfg.json)
+      OP25_CONFIG: cfg.json
+
+      # Verbosity: 0=quiet 1=normal 2=verbose 10=debug
+      OP25_VERBOSITY: "1"
+
+      # Icecast passwords — change these before exposing port 8000 externally
+      ICECAST_SOURCE_PASSWORD: op25source
+      ICECAST_RELAY_PASSWORD:  op25relay
+      ICECAST_ADMIN_PASSWORD:  op25admin
+
+      # Hostname reported in the Icecast admin UI and stream listings
+      # Set to the machine's real hostname or IP for external access
+      ICECAST_HOSTNAME: localhost
+
+      ICECAST_PORT:  "8000"
+      ICECAST_MOUNT: op25          # stream at http://host:8000/op25
+
+      # Audio tuning
+      AUDIO_PORT: "23456"          # must match destination UDP port in cfg.json
+      AUDIO_GAIN: "1.35"
+
+    restart: unless-stopped
+
+    # Make container logs readable with: docker compose logs -f
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
