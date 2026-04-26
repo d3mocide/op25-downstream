@@ -1,0 +1,44 @@
+# tgid-tags.tsv — Talkgroup ID to name mapping
+#
+# Format (tab-separated, no header row):
+#   TGID <tab> Tag <tab> Priority
+#
+# TGID      Integer talkgroup ID
+# Tag       Human-readable name (shown in web UI and Icecast metadata)
+# Priority  Optional. Integer 1–9. Lower number = higher priority (preempts lower-priority calls).
+#           Default is 3 if omitted. Use priority 1 for critical channels.
+#
+# Lines starting with # are comments and are ignored.
+# The file must be UTF-8 (with or without BOM).
+#
+# Colors are NOT set here — they are set in cfg.json under terminal.smart_colors
+# using keyword matching on the Tag text.
+#
+# Example entries — replace with your actual system's talkgroup IDs and names:
+
+# --- Fire / EMS ---
+1001	Fire Dispatch	1
+1002	Fire TAC 1	2
+1003	Fire TAC 2	2
+1004	Fire TAC 3	2
+1010	EMS Dispatch	1
+1011	EMS TAC 1	2
+1012	EMS Zone 1	2
+1013	EMS Zone 2	2
+
+# --- Law Enforcement ---
+2001	PD Dispatch	1
+2002	PD TAC 1	2
+2003	PD TAC 2	2
+2010	Sheriff Dispatch	1
+2011	Sheriff TAC 1	2
+
+# --- Public Works / Utilities ---
+3001	Public Works	3
+3002	Highway Dept	3
+3003	Water Dept	3
+
+# --- Interop ---
+4001	Interop 1	2
+4002	Interop 2	2
+4003	Mutual Aid	1
